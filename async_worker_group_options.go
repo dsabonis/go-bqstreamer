@@ -127,3 +127,13 @@ func SetAsyncSkipInvalidRows(skip bool) AsyncOptionFunc {
 		return nil
 	}
 }
+
+// SetTemplateSuffixFormat sets template/table suffix (date) format
+//
+// This should be set if BigQuery tables are partitioned by date
+func SetAsyncTemplateSuffixFormat(suffixFormat string) AsyncOptionFunc {
+	return func(w *AsyncWorkerGroup) error {
+		w.templateSuffixFormat = suffixFormat
+		return nil
+	}
+}

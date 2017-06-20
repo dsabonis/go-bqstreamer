@@ -47,6 +47,9 @@ type AsyncWorkerGroup struct {
 	// The default value is false, which causes the entire request
 	// to fail if any invalid rows exist.
 	skipInvalidRows bool
+
+	// Defines template/table suffix format when inserting new entries
+	templateSuffixFormat string
 }
 
 // New returns a new AsyncWorkerGroup using given OAuth2/JWT configuration.
@@ -87,6 +90,7 @@ func newAsyncWorkerGroup(newHTTPClient func() *http.Client, options ...AsyncOpti
 			SetSyncRetryInterval(m.retryInterval),
 			SetSyncIgnoreUnknownValues(m.ignoreUnknownValues),
 			SetSyncSkipInvalidRows(m.skipInvalidRows),
+			SetSyncTemplateSuffixFormat(m.templateSuffixFormat),
 		)
 		if err != nil {
 			return nil, err

@@ -66,3 +66,13 @@ func SetSyncSkipInvalidRows(skip bool) SyncOptionFunc {
 		return nil
 	}
 }
+
+// SetTemplateSuffixFormat sets template/table suffix (date) format
+//
+// This should be set if BigQuery tables are partitioned by date
+func SetSyncTemplateSuffixFormat(suffixFormat string) SyncOptionFunc {
+	return func(w *SyncWorker) error {
+		w.templateSuffixFormat = suffixFormat
+		return nil
+	}
+}

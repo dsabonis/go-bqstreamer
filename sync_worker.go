@@ -41,6 +41,9 @@ type SyncWorker struct {
 	// The default value is false, which causes the entire request
 	// to fail if any invalid rows exist.
 	skipInvalidRows bool
+
+	// Defines template/table suffix format when inserting new entries
+	templateSuffixFormat string
 }
 
 // NewSyncWorker returns a new SyncWorker.
@@ -146,15 +149,19 @@ func (w *SyncWorker) insertAll(insertFunc func(projectID, datasetID, tableID str
 // TODO cache bigquery service instead of creating a new one every insertTable() call
 // TODO add support for SkipInvalidRows, IgnoreUnknownValues
 func (w *SyncWorker) insertTable(projectID, datasetID, tableID string, tbl table) *TableInsertErrors {
+	req := bigquery.TableDataInsertAllRequest{
+		Kind:                "bigquery#tableDataInsertAllRequest",
+		Rows:                tbl,
+		IgnoreUnknownValues: w.ignoreUnknownValues,
+		SkipInvalidRows:     w.skipInvalidRows,
+	}
+	if w.templateSuffixFormat != "" {
+		req.TemplateSuffix = time.Now().Format(w.templateSuffixFormat)
+	}
 	res, err := bigquery.NewTabledataService(w.service).
 		InsertAll(
 			projectID, datasetID, tableID,
-			&bigquery.TableDataInsertAllRequest{
-				Kind:                "bigquery#tableDataInsertAllRequest",
-				Rows:                tbl,
-				IgnoreUnknownValues: w.ignoreUnknownValues,
-				SkipInvalidRows:     w.skipInvalidRows,
-			}).
+			&req).
 		Do()
 
 	var rows []*bigquery.TableDataInsertAllResponseInsertErrors
